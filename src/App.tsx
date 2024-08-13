@@ -1,8 +1,8 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import data from "./data.json"
 
 function App() {
-  const cart = [
+  const [cart, setCart] = useState([
     {
       id: "abcd1",
       name: "Classic Tiramisu",
@@ -21,8 +21,50 @@ function App() {
       price: 6.50,
       quantity: 2,
     },
-  ]
+  ])
   const isCartEmpty = cart.length === 0
+
+  type CartProduct = {
+    id: string,
+    name: string,
+    price: number,
+    quantity: number,
+  }
+
+  const getTotalProductPrice = (product:CartProduct) => {
+    return product.price * product.quantity
+  }
+
+  const orderTotal = cart.reduce((acc, product) => acc + getTotalProductPrice(product), 0)
+
+  type Product = {
+    "id": string
+    "image": {
+      "thumbnail": string
+      "mobile": string
+      "tablet": string
+      "desktop": string
+    },
+    "name": string
+    "category": string
+    "price": number
+  }
+
+  const addItem = (product:Product) => {
+    setCart([
+      ...cart,
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+      },
+    ])
+  }
+
+  const removeItem = (id:string) => {
+    setCart(cart.filter(product => product.id !== id))
+  }
 
   useEffect(() => {
     document.body.classList.add("bg-rose-50")
@@ -41,7 +83,11 @@ function App() {
             <div key={product.id}>
               <div className="relative">
                 <img src={product.image.mobile} className="rounded-8" />
-                <button type="button" className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 w-160 p-12 flex justify-center border border-rose-400 bg-white rounded-full">
+                <button
+                  type="button"
+                  className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 w-160 p-12 flex justify-center border border-rose-400 bg-white rounded-full"
+                  onClick={() => addItem(product)}
+                >
                   <img src="/assets/images/icon-add-to-cart.svg" alt="" />
                   <span className="ml-8 text-14 font-semibold text-rose-900">Add to Cart</span>
                 </button>
@@ -67,8 +113,7 @@ function App() {
             <>
               <div className="mt-8">
                 {cart.map(product => {
-                  const individualProductPrice = "@" + product.price.toFixed(2)
-                  const totalProductPrice = "$" + (product.price * product.quantity).toFixed(2)
+                  const totalProductPrice = getTotalProductPrice(product)
 
                   return (
                     <div
@@ -79,11 +124,15 @@ function App() {
                         <p className="text-14 font-semibold text-rose-900">{product.name}</p>
                         <div className="mt-8 flex">
                           <p className="text-14 font-semibold text-red">{product.quantity}x</p>
-                          <p className="ml-16 text-14 text-rose-500">{individualProductPrice}</p>
-                          <p className="ml-8 text-14 font-semibold text-rose-500">{totalProductPrice}</p>
+                          <p className="ml-16 text-14 text-rose-500">@{product.price.toFixed(2)}</p>
+                          <p className="ml-8 text-14 font-semibold text-rose-500">${totalProductPrice.toFixed(2)}</p>
                         </div>
                       </div>
-                      <button type="button" className="w-20 h-20 flex items-center justify-center border border-rose-400 rounded-full">
+                      <button
+                        type="button"
+                        className="w-20 h-20 flex items-center justify-center border border-rose-400 rounded-full"
+                        onClick={() => removeItem(product.id)}
+                      >
                         <img src="/assets/images/icon-remove-item.svg" alt="" />
                       </button>
                     </div>
@@ -92,7 +141,7 @@ function App() {
               </div>
               <div className="mt-8 pt-24 flex justify-between items-center border-t border-rose-100">
                 <p className="text-14 text-rose-900">Order total</p>
-                <p className="text-24 font-bold text-rose-900">$46.50</p>
+                <p className="text-24 font-bold text-rose-900">${orderTotal.toFixed(2)}</p>
               </div>
               <div className="mt-24 py-16 flex justify-center items-center bg-rose-50 rounded-8">
                 <img src="/assets/images/icon-carbon-neutral.svg" alt="" />
