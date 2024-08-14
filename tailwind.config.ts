@@ -1,12 +1,15 @@
-/** @type {import('tailwindcss').Config} */
-const pxToRem = (px, base = 16) => {
+import type { Config } from 'tailwindcss'
+
+const pxToRem = (px:number, base = 16) => {
   return `${px / base}rem`
 }
 
 const generateFontSize = () => {
   const min = 12
   const max = 100
-  const fontSize = {}
+  const fontSize:{
+    [key:string]: string,
+  } = {}
 
   for (let i = min; i <= max; i += 2) {
     fontSize[i] = pxToRem(i)
@@ -17,7 +20,9 @@ const generateFontSize = () => {
 
 const generateBorderRadius = () => {
   const max = 24
-  const borderRadius = {}
+  const borderRadius:{
+    [key:string]: string,
+  } = {}
 
   for (let i = 0; i <= max; i += 2) {
     const value = i
@@ -30,7 +35,9 @@ const generateBorderRadius = () => {
 
 const generateSpacing = () => {
   const max = 5000
-  const spacing = {}
+  const spacing:{
+    [key:string]: string,
+  } = {}
 
   for (let i = 0; i <= max; i++) {
     spacing[i] = `${i}px`
@@ -67,5 +74,4 @@ export default {
     },
   },
   plugins: [],
-}
-
+} satisfies Config

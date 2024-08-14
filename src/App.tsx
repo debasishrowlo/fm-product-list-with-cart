@@ -1,54 +1,41 @@
 import { useEffect, useState } from "react"
+import resolveConfig from "tailwindcss/resolveConfig"
+
+import tailwindConfig from "@/../tailwind.config"
 import data from "./data.json"
 
-function App() {
-  const [cart, setCart] = useState([
-    {
-      id: "abcd1",
-      name: "Classic Tiramisu",
-      price: 5.50,
-      quantity: 1,
-    },
-    {
-      id: "abcd2",
-      name: "Vanilla Bean Crème Brûlée",
-      price: 7.00,
-      quantity: 4,
-    },
-    {
-      id: "abcd3",
-      name: "Vanilla Panna Cotta",
-      price: 6.50,
-      quantity: 2,
-    },
-  ])
-  const isCartEmpty = cart.length === 0
+const config = resolveConfig(tailwindConfig)
+const screens = config.theme.screens
 
-  type CartProduct = {
-    id: string,
-    name: string,
-    price: number,
-    quantity: number,
-  }
+type Product = {
+  id: string
+  image: {
+    thumbnail: string
+    mobile: string
+    tablet: string
+    desktop: string
+  },
+  name: string
+  category: string
+  price: number
+}
+
+type CartProduct = {
+  id: string,
+  name: string,
+  price: number,
+  quantity: number,
+}
+
+function App() {
+  const [cart, setCart] = useState<CartProduct[]>([])
+  const isCartEmpty = cart.length === 0
 
   const getTotalProductPrice = (product:CartProduct) => {
     return product.price * product.quantity
   }
 
   const orderTotal = cart.reduce((acc, product) => acc + getTotalProductPrice(product), 0)
-
-  type Product = {
-    "id": string
-    "image": {
-      "thumbnail": string
-      "mobile": string
-      "tablet": string
-      "desktop": string
-    },
-    "name": string
-    "category": string
-    "price": number
-  }
 
   const addItem = (product:Product) => {
     setCart([
@@ -79,26 +66,39 @@ function App() {
       <div className="grow">
         <h1 className="text-40 font-bold text-rose-900 lg:mt-0 lg:px-0">{data.category}</h1>
         <div className="mt-32 grid gap-y-24 md:grid-cols-3 md:gap-x-24 md:gap-y-32 lg:px-0">
-          {data.products.map(product => (
-            <div key={product.id}>
-              <div className="relative">
-                <img src={product.image.mobile} className="rounded-8" />
-                <button
-                  type="button"
-                  className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 w-160 p-12 flex justify-center border border-rose-400 bg-white rounded-full"
-                  onClick={() => addItem(product)}
-                >
-                  <img src="/assets/images/icon-add-to-cart.svg" alt="" />
-                  <span className="ml-8 text-14 font-semibold text-rose-900">Add to Cart</span>
-                </button>
+          {data.products.map(product => {
+            const inCart = cart.some(cartProduct => cartProduct.id === product.id)
+
+            return (
+              <div key={product.id}>
+                <div className="relative">
+                  <div className="relative overflow-hidden rounded-8">
+                    {inCart && (
+                      <div className="absolute inset-0 border-2 border-red rounded-8"></div>
+                    )}
+                    <picture>
+                      <source media={`(min-width:${screens.lg})`} srcSet={product.image.desktop} />
+                      <source media={`(min-width:${screens.md})`} srcSet={product.image.tablet} />
+                      <img src={product.image.mobile} alt="" />
+                    </picture>
+                  </div>
+                  <button
+                    type="button"
+                    className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 w-160 p-12 flex justify-center border border-rose-400 bg-white rounded-full"
+                    onClick={() => addItem(product)}
+                  >
+                    <img src="/assets/images/icon-add-to-cart.svg" alt="" />
+                    <span className="ml-8 text-14 font-semibold text-rose-900">Add to Cart</span>
+                  </button>
+                </div>
+                <div className="mt-38">
+                  <p className="text-14 text-rose-500">{product.category}</p>
+                  <p className="mt-4 font-semibold text-rose-900">{product.name}</p>
+                  <p className="mt-4 font-semibold text-red">${product.price.toFixed(2)}</p>
+                </div>
               </div>
-              <div className="mt-38">
-                <p className="text-14 text-rose-500">{product.category}</p>
-                <p className="mt-4 font-semibold text-rose-900">{product.name}</p>
-                <p className="mt-4 font-semibold text-red">${product.price.toFixed(2)}</p>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
       <div className="mt-32 shrink-0 lg:w-384 lg:mt-0 lg:px-0">
