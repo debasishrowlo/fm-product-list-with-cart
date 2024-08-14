@@ -277,8 +277,8 @@ function App() {
       </div>
       <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)}>
         <div className="fixed inset-0 bg-black/50">
-          <DialogPanel>
-            <div className="absolute bottom-0 w-full md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:px-40 lg:max-w-592 lg:left-1/2 lg:-translate-x-1/2 lg:px-0">
+          <div className="absolute bottom-0 w-full md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:px-40 lg:max-w-592 lg:left-1/2 lg:-translate-x-1/2 lg:px-0">
+            <DialogPanel>
               <div className="max-h-[95vh] p-24 pt-40 bg-white rounded-12 overflow-y-auto md:p-40">
                 <img src="/assets/images/icon-order-confirmed.svg" alt="" />
                 <p className="mt-24 text-40 leading-tight font-bold text-rose-900">Order Confirmed</p>
@@ -316,8 +316,8 @@ function App() {
                   Start New Order
                 </button>
               </div>
-            </div>
-          </DialogPanel>
+            </DialogPanel>
+          </div>
         </div>
       </Dialog>
     </div>
