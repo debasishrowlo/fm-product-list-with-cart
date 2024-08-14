@@ -29,32 +29,50 @@ type CartProduct = {
   quantity: number,
 }
 
+const DecrementIcon = ({ className } : { className: string }) => {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="10" height="2" fill="none" viewBox="0 0 10 2"><path d="M0 .375h10v1.25H0V.375Z"/></svg>
+  )
+}
+
+const IncrementIcon = ({ className } : { className: string }) => {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M10 4.375H5.625V0h-1.25v4.375H0v1.25h4.375V10h1.25V5.625H10v-1.25Z"/></svg>
+  )
+}
+
+const RemoveItemIcon = ({ className } : { className: string }) => {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M8.375 9.375 5 6 1.625 9.375l-1-1L4 5 .625 1.625l1-1L5 4 8.375.625l1 1L6 5l3.375 3.375-1 1Z"/></svg>
+  )
+}
+
 function App() {
-  // const [cart, setCart] = useState<CartProduct[]>([])
-  const [cart, setCart] = useState<CartProduct[]>([
-    {
-      "id": "dc8691d4-c77d-4842-b857-b30db929e349",
-      "name": "Classic Tiramisu",
-      "price": 5.5,
-      "thumbnail": "./assets/images/image-tiramisu-thumbnail.jpg",
-      "quantity": 1
-    },
-    {
-      "id": "5a2599c8-0d6d-44ae-b329-1d7bf31ca762",
-      "name": "Vanilla Bean Crème Brûlée",
-      "price": 7,
-      "thumbnail": "./assets/images/image-creme-brulee-thumbnail.jpg",
-      "quantity": 4
-    },
-    {
-      "id": "cd48ed21-1141-4925-857f-79e346a799df",
-      "name": "Vanilla Panna Cotta",
-      "price": 6.5,
-      "thumbnail": "./assets/images/image-panna-cotta-thumbnail.jpg",
-      "quantity": 1
-    }
-  ])
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState(true)
+  const [cart, setCart] = useState<CartProduct[]>([])
+  // const [cart, setCart] = useState<CartProduct[]>([
+  //   {
+  //     "id": "dc8691d4-c77d-4842-b857-b30db929e349",
+  //     "name": "Classic Tiramisu",
+  //     "price": 5.5,
+  //     "thumbnail": "./assets/images/image-tiramisu-thumbnail.jpg",
+  //     "quantity": 1
+  //   },
+  //   {
+  //     "id": "5a2599c8-0d6d-44ae-b329-1d7bf31ca762",
+  //     "name": "Vanilla Bean Crème Brûlée",
+  //     "price": 7,
+  //     "thumbnail": "./assets/images/image-creme-brulee-thumbnail.jpg",
+  //     "quantity": 4
+  //   },
+  //   {
+  //     "id": "cd48ed21-1141-4925-857f-79e346a799df",
+  //     "name": "Vanilla Panna Cotta",
+  //     "price": 6.5,
+  //     "thumbnail": "./assets/images/image-panna-cotta-thumbnail.jpg",
+  //     "quantity": 1
+  //   }
+  // ])
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
 
   const isCartEmpty = cart.length === 0
 
@@ -154,7 +172,7 @@ function App() {
                 <div className="relative">
                   <div className="relative overflow-hidden rounded-8">
                     {productAddedToCart && (
-                      <div className="absolute inset-0 border-2 border-red rounded-8"></div>
+                      <div className="absolute inset-0 border-2 border-red-100 rounded-8"></div>
                     )}
                     <picture>
                       <source media={`(min-width:${screens.lg})`} srcSet={product.image.desktop} />
@@ -165,23 +183,23 @@ function App() {
                   <div className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 w-160">
                     <button
                       type="button"
-                      className="w-full p-12 flex justify-center border border-rose-400 bg-white rounded-full"
+                      className="w-full p-12 flex justify-center border border-rose-400 hover:border-red-100 bg-white rounded-full transition"
                       onClick={() => addItem(product)}
                     >
                       <img src="/assets/images/icon-add-to-cart.svg" alt="" />
                       <span className="ml-8 text-14 font-semibold text-rose-900">Add to Cart</span>
                     </button>
                     {productAddedToCart && (
-                      <div className="absolute inset-0 flex justify-between items-center bg-red rounded-full">
-                        <button type="button" className="h-full px-12" onClick={() => decrementQuantity(product)}>
-                          <div className="w-20 h-20 flex items-center justify-center border border-white rounded-full">
-                            <img src="/assets/images/icon-decrement-quantity.svg" alt="" />
+                      <div className="absolute inset-0 flex justify-between items-center bg-red-100 rounded-full">
+                        <button type="button" className="h-full px-12 group" onClick={() => decrementQuantity(product)}>
+                          <div className="w-20 h-20 flex items-center justify-center border border-white group-hover:bg-white rounded-full transition">
+                            <DecrementIcon className="fill-white group-hover:fill-red-100 transition" />
                           </div>
                         </button>
                         <p className="text-white">{cartProduct.quantity}</p>
-                        <button type="button" className="h-full px-12" onClick={() => incrementQuantity(product)}>
-                          <div className="w-20 h-20 flex items-center justify-center border border-white rounded-full">
-                            <img src="/assets/images/icon-increment-quantity.svg" alt="" />
+                        <button type="button" className="h-full px-12 group" onClick={() => incrementQuantity(product)}>
+                          <div className="w-20 h-20 flex items-center justify-center border border-white group-hover:bg-white rounded-full transition">
+                            <IncrementIcon className="fill-white group-hover:fill-red-100 transition" />
                           </div>
                         </button>
                       </div>
@@ -191,7 +209,7 @@ function App() {
                 <div className="mt-38">
                   <p className="text-14 text-rose-500">{product.category}</p>
                   <p className="mt-4 font-semibold text-rose-900">{product.name}</p>
-                  <p className="mt-4 font-semibold text-red">${product.price.toFixed(2)}</p>
+                  <p className="mt-4 font-semibold text-red-100">${product.price.toFixed(2)}</p>
                 </div>
               </div>
             )
@@ -200,7 +218,7 @@ function App() {
       </div>
       <div className="mt-32 shrink-0 lg:w-384 lg:mt-0 lg:px-0">
         <div className="p-24 bg-white rounded-12">
-          <p className="text-24 font-bold text-red">Your Cart ({cart.length})</p>
+          <p className="text-24 font-bold text-red-100">Your Cart ({cart.length})</p>
           {isCartEmpty ? (
             <div className="mt-24 py-16">
               <img src="/assets/images/illustration-empty-cart.svg" className="mx-auto" alt="" />
@@ -220,17 +238,17 @@ function App() {
                       <div>
                         <p className="text-14 font-semibold text-rose-900">{product.name}</p>
                         <div className="mt-8 flex">
-                          <p className="text-14 font-semibold text-red">{product.quantity}x</p>
+                          <p className="text-14 font-semibold text-red-100">{product.quantity}x</p>
                           <p className="ml-16 text-14 text-rose-500">@{product.price.toFixed(2)}</p>
                           <p className="ml-8 text-14 font-semibold text-rose-500">${totalProductPrice.toFixed(2)}</p>
                         </div>
                       </div>
                       <button
                         type="button"
-                        className="w-20 h-20 flex items-center justify-center border border-rose-400 rounded-full"
+                        className="group w-20 h-20 flex items-center justify-center border border-rose-400 hover:border-rose-900 rounded-full transition"
                         onClick={() => removeItem(product)}
                       >
-                        <img src="/assets/images/icon-remove-item.svg" alt="" />
+                        <RemoveItemIcon className="fill-rose-300 group-hover:fill-rose-900 transition" />
                       </button>
                     </div>
                   )
@@ -248,7 +266,7 @@ function App() {
               </div>
               <button
                 type="button"
-                className="w-full mt-24 py-16 bg-red font-semibold text-white rounded-full"
+                className="w-full mt-24 py-16 bg-red-100 hover:bg-red-200 font-semibold text-white rounded-full transition"
                 onClick={() => setConfirmDialogOpen(true)}
               >
                 Confirm Order
@@ -277,7 +295,7 @@ function App() {
                             {product.name}
                           </p>
                           <div className="mt-8 flex items-center">
-                            <p className="text-14 font-semibold text-red">{product.quantity}x</p>
+                            <p className="text-14 font-semibold text-red-100">{product.quantity}x</p>
                             <p className="ml-8 text-14 text-rose-500">@{product.price.toFixed(2)}</p>
                           </div>
                         </div>
@@ -292,7 +310,7 @@ function App() {
                 </div>
                 <button
                   type="button"
-                  className="w-full mt-32 py-16 bg-red font-semibold text-white rounded-full"
+                  className="w-full mt-32 py-16 bg-red-100 hover:bg-red-200 font-semibold text-white rounded-full transition"
                   onClick={() => startNewOrder()}
                 >
                   Start New Order

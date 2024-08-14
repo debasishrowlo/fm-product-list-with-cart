@@ -60,7 +60,10 @@ export default {
         "sans": ['"Red Hat Text", sans-serif'],
       },
       colors: {
-        red: "#C73B0F",
+        red: {
+          100: "#C73B0F",
+          200: "#952c0b",
+        },
         rose: {
           50: "#FCF8F6",
           100: "#F5EEEC",
@@ -70,6 +73,9 @@ export default {
           900: "#260F08",
         },
         green: "#1EA575",
+      },
+      transitionDuration: {
+        DEFAULT: "300ms",
       },
     },
   },
