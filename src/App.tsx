@@ -1,9 +1,11 @@
 import { useEffect, useState, Fragment } from "react"
 import resolveConfig from "tailwindcss/resolveConfig"
-import { Dialog, DialogPanel } from "@headlessui/react"
+import { Dialog, DialogPanel, TransitionChild } from "@headlessui/react"
+import classnames from "classnames"
 
 import tailwindConfig from "@/../tailwind.config"
 import data from "./data.json"
+import { IncrementIcon, DecrementIcon, RemoveItemIcon } from "./icons"
 
 const config = resolveConfig(tailwindConfig)
 const screens = config.theme.screens
@@ -29,52 +31,11 @@ type CartProduct = {
   quantity: number,
 }
 
-const DecrementIcon = ({ className } : { className: string }) => {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="10" height="2" fill="none" viewBox="0 0 10 2"><path d="M0 .375h10v1.25H0V.375Z"/></svg>
-  )
-}
-
-const IncrementIcon = ({ className } : { className: string }) => {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M10 4.375H5.625V0h-1.25v4.375H0v1.25h4.375V10h1.25V5.625H10v-1.25Z"/></svg>
-  )
-}
-
-const RemoveItemIcon = ({ className } : { className: string }) => {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M8.375 9.375 5 6 1.625 9.375l-1-1L4 5 .625 1.625l1-1L5 4 8.375.625l1 1L6 5l3.375 3.375-1 1Z"/></svg>
-  )
-}
-
 function App() {
   const [cart, setCart] = useState<CartProduct[]>([])
-  // const [cart, setCart] = useState<CartProduct[]>([
-  //   {
-  //     "id": "dc8691d4-c77d-4842-b857-b30db929e349",
-  //     "name": "Classic Tiramisu",
-  //     "price": 5.5,
-  //     "thumbnail": "./assets/images/image-tiramisu-thumbnail.jpg",
-  //     "quantity": 1
-  //   },
-  //   {
-  //     "id": "5a2599c8-0d6d-44ae-b329-1d7bf31ca762",
-  //     "name": "Vanilla Bean Crème Brûlée",
-  //     "price": 7,
-  //     "thumbnail": "./assets/images/image-creme-brulee-thumbnail.jpg",
-  //     "quantity": 4
-  //   },
-  //   {
-  //     "id": "cd48ed21-1141-4925-857f-79e346a799df",
-  //     "name": "Vanilla Panna Cotta",
-  //     "price": 6.5,
-  //     "thumbnail": "./assets/images/image-panna-cotta-thumbnail.jpg",
-  //     "quantity": 1
-  //   }
-  // ])
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
 
-  const isCartEmpty = cart.length === 0
+  const cartIsEmpty = cart.length === 0
 
   const getTotalProductPrice = (product:CartProduct) => {
     return product.price * product.quantity
@@ -219,7 +180,7 @@ function App() {
       <div className="mt-32 shrink-0 lg:w-384 lg:mt-0 lg:px-0">
         <div className="p-24 bg-white rounded-12">
           <p className="text-24 font-bold text-red-100">Your Cart ({cart.length})</p>
-          {isCartEmpty ? (
+          {cartIsEmpty ? (
             <div className="mt-24 py-16">
               <img src="/assets/images/illustration-empty-cart.svg" className="mx-auto" alt="" />
               <p className="mt-16 text-center text-14 font-semibold text-rose-500">Your added items will appear here</p>
@@ -275,47 +236,55 @@ function App() {
           )}
         </div>
       </div>
-      <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)}>
-        <div className="fixed inset-0 bg-black/50 overflow-auto">
-          <div className="mx-auto min-h-screen pt-50 flex items-end md:px-40 md:py-50 md:items-center lg:px-0 lg:max-w-592">
+      <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)} transition>
+        <div className="fixed w-screen inset-0 overflow-auto">
+          <div className="relative min-h-screen pt-100 flex justify-center items-end md:px-40 md:py-50 md:items-center lg:px-0">
+            <TransitionChild>
+              <div className="absolute inset-0 bg-black/50 transition data-[closed]:opacity-0"></div>
+            </TransitionChild>
             <DialogPanel as={Fragment}>
-              <div className="w-full p-24 pt-40 bg-white rounded-t-12 md:rounded-b-12 md:p-40">
-                <img src="/assets/images/icon-order-confirmed.svg" alt="" />
-                <p className="mt-24 text-40 leading-tight font-bold text-rose-900">Order Confirmed</p>
-                <p className="mt-8 text-rose-500">We hope you enjoy your food!</p>
-                <div className="mt-32 p-24 bg-rose-50 rounded-8">
-                  {cart.map(product => {
-                    const totalProductPrice = getTotalProductPrice(product)
+              <TransitionChild>
+                <div className={classnames([
+                  "w-full relative z-10 p-24 pt-40 bg-white rounded-t-12 transition md:rounded-b-12 md:p-40 lg:max-w-592",
+                  "data-[closed]:translate-y-full md:data-[closed]:translate-y-100 md:data-[closed]:opacity-0",
+                ])}>
+                  <img src="/assets/images/icon-order-confirmed.svg" alt="" />
+                  <p className="mt-24 text-40 leading-tight font-bold text-rose-900">Order Confirmed</p>
+                  <p className="mt-8 text-rose-500">We hope you enjoy your food!</p>
+                  <div className="mt-32 p-24 bg-rose-50 rounded-8">
+                    {cart.map(product => {
+                      const totalProductPrice = getTotalProductPrice(product)
 
-                    return (
-                      <div key={product.id} className="py-16 first:pt-0 last:pb-0 flex items-center border-t first:border-t-0 border-rose-100">
-                        <img src={product.thumbnail} className="w-48 rounded-4" alt="" />
-                        <div className="ml-16 grow overflow-hidden">
-                          <p className="whitespace-nowrap overflow-hidden text-ellipsis text-14 font-semibold text-rose-900">
-                            {product.name}
-                          </p>
-                          <div className="mt-8 flex items-center">
-                            <p className="text-14 font-semibold text-red-100">{product.quantity}x</p>
-                            <p className="ml-8 text-14 text-rose-500">@{product.price.toFixed(2)}</p>
+                      return (
+                        <div key={product.id} className="py-16 first:pt-0 last:pb-0 flex items-center border-t first:border-t-0 border-rose-100">
+                          <img src={product.thumbnail} className="w-48 rounded-4" alt="" />
+                          <div className="ml-16 grow overflow-hidden">
+                            <p className="whitespace-nowrap overflow-hidden text-ellipsis text-14 font-semibold text-rose-900">
+                              {product.name}
+                            </p>
+                            <div className="mt-8 flex items-center">
+                              <p className="text-14 font-semibold text-red-100">{product.quantity}x</p>
+                              <p className="ml-8 text-14 text-rose-500">@{product.price.toFixed(2)}</p>
+                            </div>
                           </div>
+                          <div className="ml-8 shrink-0 font-semibold text-rose-900">${totalProductPrice.toFixed(2)}</div>
                         </div>
-                        <div className="ml-8 shrink-0 font-semibold text-rose-900">${totalProductPrice.toFixed(2)}</div>
-                      </div>
-                    )
-                  })}
-                  <div className="mt-24 pt-24 flex justify-between items-center border-t border-rose-100">
-                    <p className="text-14 text-rose-900">Order Total</p>
-                    <p className="text-24 font-bold text-rose-900">${orderTotal.toFixed(2)}</p>
+                      )
+                    })}
+                    <div className="mt-24 pt-24 flex justify-between items-center border-t border-rose-100">
+                      <p className="text-14 text-rose-900">Order Total</p>
+                      <p className="text-24 font-bold text-rose-900">${orderTotal.toFixed(2)}</p>
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    className="w-full mt-32 py-16 bg-red-100 hover:bg-red-200 font-semibold text-white rounded-full transition"
+                    onClick={() => startNewOrder()}
+                  >
+                    Start New Order
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  className="w-full mt-32 py-16 bg-red-100 hover:bg-red-200 font-semibold text-white rounded-full transition"
-                  onClick={() => startNewOrder()}
-                >
-                  Start New Order
-                </button>
-              </div>
+              </TransitionChild>
             </DialogPanel>
           </div>
         </div>
