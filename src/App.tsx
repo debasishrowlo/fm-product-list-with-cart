@@ -151,13 +151,13 @@ function App() {
                       <span className="ml-8 text-14 font-semibold text-rose-900">Add to Cart</span>
                     </button>
                     {productAddedToCart && (
-                      <div className="absolute inset-0 flex justify-between items-center bg-red-100 rounded-full">
+                      <div className="absolute inset-0 flex items-center bg-red-100 rounded-full">
                         <button type="button" className="h-full px-12 group" onClick={() => decrementQuantity(product)}>
                           <div className="w-20 h-20 flex items-center justify-center border border-white group-hover:bg-white rounded-full transition">
                             <DecrementIcon className="fill-white group-hover:fill-red-100 transition" />
                           </div>
                         </button>
-                        <p className="text-white">{cartProduct.quantity}</p>
+                        <p className="grow text-center text-white">{cartProduct.quantity}</p>
                         <button type="button" className="h-full px-12 group" onClick={() => incrementQuantity(product)}>
                           <div className="w-20 h-20 flex items-center justify-center border border-white group-hover:bg-white rounded-full transition">
                             <IncrementIcon className="fill-white group-hover:fill-red-100 transition" />
