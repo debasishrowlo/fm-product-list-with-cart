@@ -236,7 +236,7 @@ function App() {
           )}
         </div>
       </div>
-      <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)} transition>
+      <Dialog open={confirmDialogOpen} onClose={() => {}} transition>
         <div className="fixed w-screen inset-0 overflow-auto">
           <div className="relative min-h-screen pt-100 flex justify-center items-end md:px-40 md:py-50 md:items-center lg:px-0">
             <TransitionChild>
