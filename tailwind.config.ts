@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const pxToRem = (px:number, base = 16) => {
-  return `${px / base}rem`
+  return px / base
 }
 
 const generateFontSize = () => {
@@ -12,7 +12,7 @@ const generateFontSize = () => {
   } = {}
 
   for (let i = min; i <= max; i += 2) {
-    fontSize[i] = pxToRem(i)
+    fontSize[i] = pxToRem(i) + "rem"
   }
 
   return fontSize
@@ -25,8 +25,7 @@ const generateBorderRadius = () => {
   } = {}
 
   for (let i = 0; i <= max; i += 2) {
-    const value = i
-    borderRadius[i] = pxToRem(value)
+    borderRadius[i] = pxToRem(i) + "rem"
   }
   borderRadius["full"] = "9999px"
 
@@ -40,7 +39,7 @@ const generateSpacing = () => {
   } = {}
 
   for (let i = 0; i <= max; i++) {
-    spacing[i] = `${i}px`
+    spacing[i] = pxToRem(i) + "rem"
   }
 
   return spacing
@@ -55,10 +54,10 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    borderRadius: generateBorderRadius(),
+    fontSize: generateFontSize(),
+    spacing: generateSpacing(),
     extend: {
-      borderRadius: generateBorderRadius(),
-      fontSize: generateFontSize(),
-      spacing: generateSpacing(),
       fontFamily: {
         "sans": ['"Red Hat Text", sans-serif'],
       },

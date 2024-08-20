@@ -4,8 +4,8 @@ import { Dialog, DialogPanel, TransitionChild } from "@headlessui/react"
 import classnames from "classnames"
 
 import tailwindConfig from "@/../tailwind.config"
-import data from "./data.json"
-import { IncrementIcon, DecrementIcon, RemoveItemIcon } from "./icons"
+import products from "./data.json"
+import * as Icons from "./icons"
 
 const config = resolveConfig(tailwindConfig)
 const screens = config.theme.screens
@@ -25,9 +25,6 @@ type Product = {
 
 type CartProduct = {
   id: string,
-  name: string,
-  price: number,
-  thumbnail: string,
   quantity: number,
 }
 
@@ -37,26 +34,36 @@ function App() {
 
   const cartIsEmpty = cart.length === 0
 
-  const getTotalProductPrice = (product:CartProduct) => {
-    return product.price * product.quantity
+  const findProduct = (productId:string) => {
+    const product = products.find(product => product.id === productId)
+
+    if (!product) {
+      throw new Error("Product not found")
+    }
+
+    return product
   }
 
-  const orderTotal = cart.reduce((acc, product) => acc + getTotalProductPrice(product), 0)
+  const getTotalProductPrice = (product:Product, cartProduct:CartProduct) => {
+    return product.price * cartProduct.quantity
+  }
+
+  const orderTotal = cart.reduce((total, cartProduct) => {
+    const product = findProduct(cartProduct.id)
+    return total + getTotalProductPrice(product, cartProduct)
+  }, 0)
 
   const addItem = (product:Product) => {
     setCart([
       ...cart,
       {
         id: product.id,
-        name: product.name,
-        price: product.price,
-        thumbnail: product.image.thumbnail,
         quantity: 1,
       },
     ])
   }
 
-  const removeItem = (product:CartProduct) => {
+  const removeItem = (product:Product) => {
     setCart(cart.filter(cartProduct => cartProduct.id !== product.id))
   }
 
@@ -68,11 +75,10 @@ function App() {
     }
 
     const cartProduct = cart[cartProductIndex]
-
     const newQuantity = cartProduct.quantity - 1
 
     if (newQuantity === 0) {
-      removeItem(cartProduct)
+      removeItem(product)
     } else {
       setCart([
         ...cart.slice(0, cartProductIndex),
@@ -86,24 +92,18 @@ function App() {
   }
 
   const incrementQuantity = (product:Product) => {
-    const cartProductIndex = cart.findIndex(cartProduct => cartProduct.id === product.id)
+    const newCart = cart.map(cartProduct => {
+      if (cartProduct.id !== product.id) {
+        return cartProduct
+      }
 
-    if (cartProductIndex === -1) {
-      throw new Error("cart product not found")
-    }
+      return {
+        ...cartProduct,
+        quantity: cartProduct.quantity + 1,
+      }
+    })
 
-    const cartProduct = cart[cartProductIndex]
-
-    const newQuantity = cartProduct.quantity + 1
-
-    setCart([
-      ...cart.slice(0, cartProductIndex),
-      {
-        ...cart[cartProductIndex],
-        quantity: newQuantity,
-      },
-      ...cart.slice(cartProductIndex + 1),
-    ])
+    setCart(newCart)
   }
 
   const startNewOrder = () => {
@@ -120,13 +120,13 @@ function App() {
   }, [])
 
   return (
-    <div className="max-w-7xl mx-auto p-24 md:p-40 lg:px-0 lg:py-88 lg:flex lg:gap-32">
+    <div className="max-w-1280 mx-auto p-24 md:p-40 lg:px-0 lg:py-88 lg:flex lg:gap-32">
       <div className="grow">
-        <h1 className="text-40 font-bold text-rose-900 lg:mt-0 lg:px-0">{data.category}</h1>
+        <h1 className="text-40 font-bold text-rose-900 lg:mt-0 lg:px-0">Desserts</h1>
         <div className="mt-32 grid gap-y-24 md:grid-cols-3 md:gap-x-24 md:gap-y-32 lg:px-0">
-          {data.products.map(product => {
-            const cartProduct = cart.find(cartProduct => cartProduct.id === product.id) || null
-            const productAddedToCart = cartProduct !== null
+          {products.map((product:Product) => {
+            const cartProduct = cart.find(cartProduct => cartProduct.id === product.id)
+            const productAddedToCart = cartProduct !== undefined
 
             return (
               <div key={product.id}>
@@ -154,13 +154,13 @@ function App() {
                       <div className="absolute inset-0 flex items-center bg-red-100 rounded-full">
                         <button type="button" className="h-full px-12 group" onClick={() => decrementQuantity(product)}>
                           <div className="w-20 h-20 flex items-center justify-center border border-white group-hover:bg-white rounded-full transition">
-                            <DecrementIcon className="fill-white group-hover:fill-red-100 transition" />
+                            <Icons.Decrement className="fill-white group-hover:fill-red-100 transition" />
                           </div>
                         </button>
                         <p className="grow text-center text-white">{cartProduct.quantity}</p>
                         <button type="button" className="h-full px-12 group" onClick={() => incrementQuantity(product)}>
                           <div className="w-20 h-20 flex items-center justify-center border border-white group-hover:bg-white rounded-full transition">
-                            <IncrementIcon className="fill-white group-hover:fill-red-100 transition" />
+                            <Icons.Increment className="fill-white group-hover:fill-red-100 transition" />
                           </div>
                         </button>
                       </div>
@@ -188,8 +188,9 @@ function App() {
           ) : (
             <>
               <div className="mt-8">
-                {cart.map(product => {
-                  const totalProductPrice = getTotalProductPrice(product)
+                {cart.map(cartProduct => {
+                  const product = findProduct(cartProduct.id)
+                  const totalProductPrice = getTotalProductPrice(product, cartProduct)
 
                   return (
                     <div
@@ -199,7 +200,7 @@ function App() {
                       <div>
                         <p className="text-14 font-semibold text-rose-900">{product.name}</p>
                         <div className="mt-8 flex">
-                          <p className="text-14 font-semibold text-red-100">{product.quantity}x</p>
+                          <p className="text-14 font-semibold text-red-100">{cartProduct.quantity}x</p>
                           <p className="ml-16 text-14 text-rose-500">@{product.price.toFixed(2)}</p>
                           <p className="ml-8 text-14 font-semibold text-rose-500">${totalProductPrice.toFixed(2)}</p>
                         </div>
@@ -209,7 +210,7 @@ function App() {
                         className="group w-20 h-20 flex items-center justify-center border border-rose-400 hover:border-rose-900 rounded-full transition"
                         onClick={() => removeItem(product)}
                       >
-                        <RemoveItemIcon className="fill-rose-300 group-hover:fill-rose-900 transition" />
+                        <Icons.RemoveItem className="fill-rose-300 group-hover:fill-rose-900 transition" />
                       </button>
                     </div>
                   )
@@ -252,18 +253,19 @@ function App() {
                   <p className="mt-24 text-40 leading-tight font-bold text-rose-900">Order Confirmed</p>
                   <p className="mt-8 text-rose-500">We hope you enjoy your food!</p>
                   <div className="mt-32 p-24 bg-rose-50 rounded-8">
-                    {cart.map(product => {
-                      const totalProductPrice = getTotalProductPrice(product)
+                    {cart.map(cartProduct => {
+                      const product = findProduct(cartProduct.id)
+                      const totalProductPrice = product.price * cartProduct.quantity
 
                       return (
                         <div key={product.id} className="py-16 first:pt-0 last:pb-0 flex items-center border-t first:border-t-0 border-rose-100">
-                          <img src={product.thumbnail} className="w-48 rounded-4" alt="" />
+                          <img src={product.image.thumbnail} className="w-48 rounded-4" alt="" />
                           <div className="ml-16 grow overflow-hidden">
                             <p className="whitespace-nowrap overflow-hidden text-ellipsis text-14 font-semibold text-rose-900">
                               {product.name}
                             </p>
                             <div className="mt-8 flex items-center">
-                              <p className="text-14 font-semibold text-red-100">{product.quantity}x</p>
+                              <p className="text-14 font-semibold text-red-100">{cartProduct.quantity}x</p>
                               <p className="ml-8 text-14 text-rose-500">@{product.price.toFixed(2)}</p>
                             </div>
                           </div>
