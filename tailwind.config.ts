@@ -45,6 +45,8 @@ const generateSpacing = () => {
   return spacing
 }
 
+const spacing = generateSpacing()
+
 export default {
   future: {
     hoverOnlyWhenSupported: true,
@@ -56,7 +58,8 @@ export default {
   theme: {
     borderRadius: generateBorderRadius(),
     fontSize: generateFontSize(),
-    spacing: generateSpacing(),
+    spacing,
+    lineHeight: spacing,
     extend: {
       fontFamily: {
         "sans": ['"Red Hat Text", sans-serif'],
